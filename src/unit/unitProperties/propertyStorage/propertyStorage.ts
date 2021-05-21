@@ -19,6 +19,6 @@ export function unitPropertyStorage(handlePropertyChange: () => void) {
   };
   return {
     reset,
-    next
+    next,
   };
 }

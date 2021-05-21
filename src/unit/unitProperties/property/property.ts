@@ -1,9 +1,7 @@
 import type { UnitProperty } from ".";
 import { resolveInitializer } from "..";
 
-export function initUnitProperty<T = unknown>(
-  handlePropertyChange: () => void
-): UnitProperty<T> {
+export function initUnitProperty<T = unknown>(handlePropertyChange: () => void): UnitProperty<T> {
   const property: UnitProperty<T> = {
     value: undefined as any,
     init(v) {
@@ -13,7 +11,7 @@ export function initUnitProperty<T = unknown>(
     set(v) {
       this.value = resolveInitializer(v, this.value as any);
       handlePropertyChange();
-    }
+    },
   };
   property.init = property.init.bind(property);
   property.set = property.set.bind(property);

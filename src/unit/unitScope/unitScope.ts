@@ -13,7 +13,7 @@ export class UnitScope {
         const result = fn();
         UnitScope.scopeData = prevData;
         return result;
-      }
+      },
     };
   }
 

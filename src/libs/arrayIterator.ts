@@ -3,6 +3,6 @@ export function iterateOver<T extends any[]>(a: T) {
   return {
     next(): T[number] {
       return iterator.next().value;
-    }
+    },
   };
 }

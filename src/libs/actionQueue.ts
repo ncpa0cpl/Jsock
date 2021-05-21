@@ -29,6 +29,6 @@ export function actionQueue() {
     exec,
     get isRunning() {
       return isRunning;
-    }
+    },
   };
 }

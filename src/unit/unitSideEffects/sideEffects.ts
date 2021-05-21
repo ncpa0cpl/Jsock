@@ -16,6 +16,6 @@ export function unitSideEffects() {
   return {
     reset,
     addEffectToQueue,
-    runQueue
+    runQueue,
   };
 }

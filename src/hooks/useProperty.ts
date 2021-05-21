@@ -1,4 +1,4 @@
-import type { Initializer, UnitProperty} from "../unit";
+import type { Initializer, UnitProperty } from "../unit";
 import { UnitScope } from "../unit";
 
 export function useProperty<T = undefined>(v: Initializer<T>) {
