@@ -1,58 +1,76 @@
 import execa from "execa";
-import { run, stdin } from "./libs";
+import { onError, onSuccess, run, stdin } from "./libs";
 
-async function main() {
-  // Add everything to the commit
-  const add = await run(execa("git", ["add", "."]));
-  if (add.error) {
-    return console.error(add.error.stderr);
+async function gitAdd() {
+  const name = "Git Add";
+  const result = await run(execa("git", ["add", "."]));
+  if (result.error) {
+    return onError(name, result.error);
   }
-  console.info(add.data.stdout);
+  return onSuccess(name);
+}
 
-  // Run eslint check
-  const lint = await run(execa("npm", ["run", "lint"]));
-  if (lint.error) {
-    return console.error(lint.error.stderr);
-  }
-  console.info(lint.data.stdout);
-
-  // Run typescript check
-  const tsc = await run(execa("npm", ["run", "tsc"]));
-  if (tsc.error) {
-    return console.error(tsc.error.stderr);
-  }
-  console.info(tsc.data.stdout);
-
-  // Run prettier check
-  const pretty = await run(execa("npm", ["run", "pretty:check"]));
-  if (pretty.error) {
-    return console.error(pretty.error.stderr);
-  }
-  console.info(pretty.data.stdout);
-
-  //   const { error } = await run(execa("npm", ["run", "test"]));
-  //   if (error) {
-  //     return console.error(error);
-  //   }
-
+async function gitCommit() {
+  const name = "Git Commit";
   const commitMessage = await stdin("Commit message:\n");
 
   if (commitMessage.length === 0) {
     console.error("Commit message cannot be empty!");
-    return;
+    throw new Error();
   }
 
-  const commit = await run(execa("git", ["commit", "-m", commitMessage]));
-  if (commit.error) {
-    return console.error(commit.error.stderr);
+  const result = await run(execa("git", ["commit", "-m", commitMessage]));
+  if (result.error) {
+    return onError(name, result.error);
   }
-  console.info(commit.data.stdout);
+  return onSuccess(name);
+}
 
-  const push = await run(execa("git", ["push"]));
-  if (push.error) {
-    return console.error(push.error.stderr);
+async function gitPush() {
+  const name = "Push";
+  const result = await run(execa("git", ["push"]));
+  if (result.error) {
+    return onError(name, result.error);
   }
-  console.info(push.data.stdout);
+  return onSuccess(name);
+}
+
+async function lint() {
+  const name = "Lint";
+  const result = await run(execa("npm", ["run", "lint"]));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
+async function tsc() {
+  const name = "TypeScript";
+  const result = await run(execa("npm", ["run", "tsc"]));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
+async function pretty() {
+  const name = "Prettier";
+  const result = await run(execa("npm", ["run", "pretty:check"]));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
+async function main() {
+  try {
+    await gitAdd();
+    await lint();
+    await tsc();
+    await pretty();
+    await gitCommit();
+    await gitPush();
+  } catch (e) {}
 
   return true;
 }
