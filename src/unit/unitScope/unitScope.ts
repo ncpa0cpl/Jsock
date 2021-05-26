@@ -1,35 +1,66 @@
 import type { UnitPropertyStorage } from "../unitProperties";
-import type { UnitSideEffects } from "../unitSideEffects";
-import type { UnitScopeData } from ".";
+import { unitPropertyStorage } from "../unitProperties";
+import type { UnitScope } from ".";
 
-export class UnitScope {
-  private static scopeData: UnitScopeData | undefined;
+const EFFECT_SCOPE: UnitScope = { storage: unitPropertyStorage(() => {}) };
 
-  static with(data: UnitScopeData) {
+export class UnitScopeManager {
+  private static sideEffects: Array<() => void> = [];
+  private static scopeStack: UnitScope[] = [];
+
+  private static validateScopeExistence(): void {
+    if (UnitScopeManager.scopeStack.length === 0) {
+      throw new Error("Usage of hooks outside of unit body is forbidden.");
+    }
+  }
+
+  private static enterScope(scope: UnitScope) {
+    UnitScopeManager.scopeStack.push(scope);
+  }
+
+  private static leaveScope() {
+    UnitScopeManager.scopeStack.pop();
+
+    if (UnitScopeManager.scopeStack.length === 0) {
+      UnitScopeManager.executeSideEffects();
+    }
+  }
+
+  private static getScope() {
+    UnitScopeManager.validateScopeExistence();
+    return UnitScopeManager.scopeStack[UnitScopeManager.scopeStack.length]!;
+  }
+
+  private static executeSideEffects() {
+    const effects = [...UnitScopeManager.sideEffects];
+    UnitScopeManager.sideEffects = [];
+
+    UnitScopeManager.with(EFFECT_SCOPE).run(() => {
+      for (const action of effects) {
+        action();
+      }
+    });
+  }
+
+  static with(scope: UnitScope) {
     return {
-      run<T>(fn: () => T): T {
-        const prevData = UnitScope.scopeData;
-        UnitScope.scopeData = data;
-        const result = fn();
-        UnitScope.scopeData = prevData;
-        return result;
+      run(fn: () => void) {
+        UnitScopeManager.enterScope(scope);
+        fn();
+        UnitScopeManager.leaveScope();
       },
     };
   }
 
   static getStorage(): UnitPropertyStorage {
-    UnitScope.validateScopeExistence();
-    return UnitScope.scopeData!.storage;
+    return UnitScopeManager.getScope().storage;
   }
 
-  static getSideEffects(): UnitSideEffects {
-    UnitScope.validateScopeExistence();
-    return UnitScope.scopeData!.sideEffects;
-  }
-
-  static validateScopeExistence(): void {
-    if (!UnitScope.scopeData) {
-      throw new Error("Usage of hooks outside of unit body is forbidden.");
+  static deferAction(action: () => void) {
+    if (UnitScopeManager.scopeStack.length > 0) {
+      UnitScopeManager.sideEffects.push(action);
+      return;
     }
+    action();
   }
 }

@@ -28,7 +28,7 @@ async function gitCommit() {
 
 async function gitPush() {
   const name = "Push";
-  const result = await run(execa("git", ["push"]));
+  const result = await run(execa("git", ["push", "-u", "origin", "HEAD"]));
   if (result.error) {
     return onError(name, result.error);
   }

@@ -1,7 +1,5 @@
 import type { UnitPropertyStorage } from "../unitProperties";
-import type { UnitSideEffects } from "../unitSideEffects";
 
-export interface UnitScopeData {
+export interface UnitScope {
   storage: UnitPropertyStorage;
-  sideEffects: UnitSideEffects;
 }
