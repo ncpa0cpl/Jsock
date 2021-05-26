@@ -2,9 +2,11 @@
   "name": "Jsock",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "browser": "dist/browser/jsock.js",
+  "main": "dist/node/jsock.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "webpack",
+    "build": "ts-node --compiler-options '{\"noUnusedLocals\": false, \"noUnusedParameters\": false}' scripts/build.ts",
     "lint": "eslint . --ext .ts --color",
     "tsc": "tsc --noEmit",
     "pretty": "prettier --write .",

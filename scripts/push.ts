@@ -35,6 +35,15 @@ async function gitPush() {
   return onSuccess(name);
 }
 
+async function build() {
+  const name = "Build";
+  const result = await run(execa("npm", ["run", "build"]));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
 async function lint() {
   const name = "Lint";
   const result = await run(execa("npm", ["run", "lint"]));
@@ -64,10 +73,11 @@ async function pretty() {
 
 async function main() {
   try {
-    await gitAdd();
     await lint();
     await tsc();
     await pretty();
+    await build();
+    await gitAdd();
     await gitCommit();
     await gitPush();
   } catch (e) {}

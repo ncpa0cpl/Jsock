@@ -1,0 +1,4 @@
+import type { UnitPropertyStorage } from "../unitProperties";
+export interface UnitScope {
+    storage: UnitPropertyStorage;
+}
