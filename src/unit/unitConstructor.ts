@@ -1,7 +1,7 @@
 import { actionQueue, limitedAction } from "../libs";
 import { unitPropertyStorage } from "./unitProperties";
-import type { UnitScope } from "./unitScope";
-import { UnitScopeManager } from "./unitScope";
+import type { UnitScope } from "./unitScopeManager";
+import { UnitScopeManager } from "./unitScopeManager";
 
 export function Unit<ARGS extends any[], R>(body: (...args: ARGS) => R) {
   return (...args: ARGS) => {

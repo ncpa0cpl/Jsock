@@ -1,6 +1,7 @@
 import type { UnitPropertyStorage } from "../unitProperties";
 import { unitPropertyStorage } from "../unitProperties";
 import type { UnitScope } from ".";
+import { UnitScopeValidationError } from "./Helpers/unitScopeValidationError";
 
 const EFFECT_SCOPE: UnitScope = { storage: unitPropertyStorage(() => {}) };
 
@@ -10,7 +11,7 @@ export class UnitScopeManager {
 
   private static validateScopeExistence(): void {
     if (UnitScopeManager.scopeStack.length === 0) {
-      throw new Error("Usage of hooks outside of unit body is forbidden.");
+      throw new UnitScopeValidationError();
     }
   }
 
