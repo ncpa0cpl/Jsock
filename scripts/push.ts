@@ -71,11 +71,21 @@ async function pretty() {
   return onSuccess(name);
 }
 
+async function test() {
+  const name = "Tests";
+  const result = await run(execa('npm', ['run', 'test']));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
 async function main() {
   try {
     await lint();
     await tsc();
     await pretty();
+    await test();
     await build();
     await gitAdd();
     await gitCommit();
