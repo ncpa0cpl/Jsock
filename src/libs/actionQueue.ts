@@ -14,14 +14,14 @@ export function actionQueue() {
     isRunning = false;
   };
 
-  const processQueue = async () => {
+  const processQueue = () => {
     if (isRunning) {
       return;
     }
     start();
     while (true) {
       const nextAction = queue.shift();
-      if (nextAction) await nextAction();
+      if (nextAction) nextAction();
       else break;
     }
     finish();
