@@ -1,9 +1,17 @@
 import type { UnitPropertyStorage } from "../unitProperties";
-import { unitPropertyStorage } from "../unitProperties";
 import type { UnitScope } from ".";
-import { UnitScopeValidationError } from "./Helpers/unitScopeValidationError";
+import { UnitScopeIllegalScopeAccess, UnitScopeValidationError } from "./Helpers/unitScopeErrors";
 
-const EFFECT_SCOPE: UnitScope = { storage: unitPropertyStorage(() => {}) };
+const EFFECT_SCOPE: UnitScope = {
+  storage: {
+    reset() {
+      throw new UnitScopeIllegalScopeAccess();
+    },
+    next() {
+      throw new UnitScopeIllegalScopeAccess();
+    },
+  },
+};
 
 export class UnitScopeManager {
   private static sideEffects: Array<() => void> = [];
@@ -22,14 +30,14 @@ export class UnitScopeManager {
   private static leaveScope() {
     UnitScopeManager.scopeStack.pop();
 
-    if (UnitScopeManager.scopeStack.length === 0) {
+    if (UnitScopeManager.scopeStack.length === 0 && UnitScopeManager.sideEffects.length > 0) {
       UnitScopeManager.executeSideEffects();
     }
   }
 
   private static getScope() {
     UnitScopeManager.validateScopeExistence();
-    return UnitScopeManager.scopeStack[UnitScopeManager.scopeStack.length]!;
+    return UnitScopeManager.scopeStack[UnitScopeManager.scopeStack.length - 1]!;
   }
 
   private static executeSideEffects() {
