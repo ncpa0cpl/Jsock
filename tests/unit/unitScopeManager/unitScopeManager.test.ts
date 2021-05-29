@@ -46,35 +46,6 @@ describe("UnitScopeManager()", () => {
 
       expect(fn.mock.calls.length).toEqual(1);
     });
-    it("executes side effects only after all scoped has been left", () => {
-      const fn = jest.fn();
-
-      const scope1 = getTestUnitScope({ values: [1] });
-      const scope2 = getTestUnitScope({ values: [2] });
-      const scope3 = getTestUnitScope({ values: [3] });
-
-      publicUnitScopeManager.enterScope(scope1);
-      publicUnitScopeManager.enterScope(scope2);
-      publicUnitScopeManager.enterScope(scope3);
-
-      publicUnitScopeManager.deferAction(fn);
-      expect(fn.mock.calls.length).toEqual(0);
-
-      publicUnitScopeManager.leaveScope(); // leave scope 3
-
-      publicUnitScopeManager.deferAction(fn);
-      expect(fn.mock.calls.length).toEqual(0);
-
-      publicUnitScopeManager.leaveScope(); // leave scope 2
-
-      publicUnitScopeManager.deferAction(fn);
-      expect(fn.mock.calls.length).toEqual(0);
-
-      // leaving the last scope should trigger all deffered actions
-      publicUnitScopeManager.leaveScope(); // leave scope 1
-
-      expect(fn.mock.calls.length).toEqual(3);
-    });
     it("correctly resolves when an side effect is created within another side effect", () => {
       const fn = jest.fn();
 
@@ -91,8 +62,10 @@ describe("UnitScopeManager()", () => {
 
         publicUnitScopeManager.leaveScope();
 
-        expect(fn.mock.calls.length).toEqual(0);
+        expect(fn.mock.calls.length).toEqual(1);
       });
+
+      expect(fn.mock.calls.length).toEqual(0);
 
       expect(() => publicUnitScopeManager.leaveScope()).not.toThrowError();
 

@@ -8,6 +8,15 @@ export const simpleTestUnit = Unit((initVal: string) => {
   };
 });
 
+export const testUnitWithOuterMethodInBody = Unit((initValue: string, method: () => void) => {
+  const [value, setValue] = useProperty(initValue);
+  method();
+  return {
+    value,
+    setValue,
+  };
+});
+
 export const testUnitWithEffectOnValueChange = Unit(
   (initVal: string, effect: (c: string) => void) => {
     const [value, setValue] = useProperty(initVal);

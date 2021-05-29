@@ -13,5 +13,5 @@ export function getTestUnitScope(
 
   storage.reset();
 
-  return { storage };
+  return { storage, sideEffects: [] };
 }

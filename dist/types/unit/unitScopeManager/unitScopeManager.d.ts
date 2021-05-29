@@ -1,7 +1,6 @@
 import type { UnitPropertyStorage } from "../unitProperties";
 import type { UnitScope } from ".";
 export declare class UnitScopeManager {
-    private static sideEffects;
     private static scopeStack;
     private static validateScopeExistence;
     private static enterScope;
@@ -12,5 +11,6 @@ export declare class UnitScopeManager {
         run(fn: () => void): void;
     };
     static getStorage(): UnitPropertyStorage;
+    static getSideEffects(): (() => void)[];
     static deferAction(action: () => void): void;
 }

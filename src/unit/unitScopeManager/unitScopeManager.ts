@@ -11,10 +11,10 @@ const EFFECT_SCOPE: UnitScope = {
       throw new UnitScopeIllegalScopeAccess();
     },
   },
+  sideEffects: [],
 };
 
 export class UnitScopeManager {
-  private static sideEffects: Array<() => void> = [];
   private static scopeStack: UnitScope[] = [];
 
   private static validateScopeExistence(): void {
@@ -28,10 +28,12 @@ export class UnitScopeManager {
   }
 
   private static leaveScope() {
-    UnitScopeManager.scopeStack.pop();
+    const scope = UnitScopeManager.scopeStack.pop();
 
-    if (UnitScopeManager.scopeStack.length === 0 && UnitScopeManager.sideEffects.length > 0) {
-      UnitScopeManager.executeSideEffects();
+    if (scope && scope.sideEffects.length > 0) {
+      const effects = [...scope.sideEffects];
+      scope.sideEffects.splice(0, scope.sideEffects.length);
+      UnitScopeManager.executeSideEffects(effects);
     }
   }
 
@@ -40,10 +42,7 @@ export class UnitScopeManager {
     return UnitScopeManager.scopeStack[UnitScopeManager.scopeStack.length - 1]!;
   }
 
-  private static executeSideEffects() {
-    const effects = [...UnitScopeManager.sideEffects];
-    UnitScopeManager.sideEffects = [];
-
+  private static executeSideEffects(effects: Array<() => void>) {
     UnitScopeManager.with(EFFECT_SCOPE).run(() => {
       for (const action of effects) {
         action();
@@ -65,9 +64,13 @@ export class UnitScopeManager {
     return UnitScopeManager.getScope().storage;
   }
 
+  static getSideEffects() {
+    return UnitScopeManager.getScope().sideEffects;
+  }
+
   static deferAction(action: () => void) {
     if (UnitScopeManager.scopeStack.length > 0) {
-      UnitScopeManager.sideEffects.push(action);
+      UnitScopeManager.getSideEffects().push(action);
       return;
     }
     action();

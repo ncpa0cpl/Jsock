@@ -14,7 +14,7 @@ export function Unit<ARGS extends any[], R>(body: (...args: ARGS) => R) {
 
     const storage = unitPropertyStorage(() => propertyChangeHandler.call());
 
-    const scopeData: UnitScope = { storage };
+    const scopeData: UnitScope = { storage, sideEffects: [] };
 
     const run = () =>
       runAction.exec(() =>

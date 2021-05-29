@@ -1,6 +1,7 @@
 import {
   simpleTestUnit,
   testUnitWithEffectOnValueChange,
+  testUnitWithOuterMethodInBody,
   testUnitWithPropSetterWithinSideEffect,
   testUnitWithSideEffectOnCreate,
   testUnitWithSideEffectOnEveryChange,
@@ -15,6 +16,26 @@ describe("Unit()", () => {
     u.setValue("another str");
 
     expect(u.value).toEqual("another str");
+  });
+  describe("correctly handles updating a Unit from Within another Unit", () => {
+    it("within sideEffect", () => {
+      const u1 = simpleTestUnit("abc");
+      const u2 = testUnitWithEffectOnValueChange("0", () => u1.setValue("123"));
+
+      u2.setValue("1");
+
+      expect(u1.value).toEqual("123");
+      expect(u2.value).toEqual("1");
+    });
+    it("within unit body", () => {
+      const u1 = simpleTestUnit("abc");
+      const u2 = testUnitWithOuterMethodInBody("0", () => u1.setValue("123"));
+
+      u2.setValue("1");
+
+      expect(u1.value).toEqual("123");
+      expect(u2.value).toEqual("1");
+    });
   });
   describe("correctly resolves side effects", () => {
     it("with side effect on property change", () => {
