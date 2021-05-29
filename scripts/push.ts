@@ -28,7 +28,16 @@ async function gitCommit() {
 
 async function gitPush() {
   const name = "Push";
-  const result = await run(execa("git", ["push"]));
+  const result = await run(execa("git", ["push", "-u", "origin", "HEAD"]));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
+async function build() {
+  const name = "Build";
+  const result = await run(execa("npm", ["run", "build"]));
   if (result.error) {
     return onError(name, result.error);
   }
@@ -62,12 +71,23 @@ async function pretty() {
   return onSuccess(name);
 }
 
+async function test() {
+  const name = "Tests";
+  const result = await run(execa('npm', ['run', 'test']));
+  if (result.error) {
+    return onError(name, result.error);
+  }
+  return onSuccess(name);
+}
+
 async function main() {
   try {
-    await gitAdd();
     await lint();
     await tsc();
     await pretty();
+    await test();
+    await build();
+    await gitAdd();
     await gitCommit();
     await gitPush();
   } catch (e) {}

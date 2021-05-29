@@ -5,11 +5,6 @@
  * consequntial array element, when reached the end of the array
  * returns undefined
  */
-export function iterateOver<T extends any[]>(a: T) {
-  const iterator = a[Symbol.iterator]();
-  return {
-    next(): T[number] {
-      return iterator.next().value;
-    },
-  };
-}
+export declare function iterateOver<T extends any[]>(a: T): {
+    next(): T[number];
+};

@@ -1,30 +1,28 @@
-import { actionQueue } from "../libs";
+import { actionQueue, limitedAction } from "../libs";
 import { unitPropertyStorage } from "./unitProperties";
-import type { UnitScopeData } from "./unitScope";
-import { UnitScope } from "./unitScope";
-import { unitSideEffects } from "./unitSideEffects";
+import type { UnitScope } from "./unitScopeManager";
+import { UnitScopeManager } from "./unitScopeManager";
 
 export function Unit<ARGS extends any[], R>(body: (...args: ARGS) => R) {
   return (...args: ARGS) => {
     const unitContainer = {};
     const runAction = actionQueue();
 
-    const onPropertyChange = () => {
-      run();
-    };
+    const propertyChangeHandler = limitedAction(() => {
+      UnitScopeManager.deferAction(run);
+    }, 1);
 
-    const storage = unitPropertyStorage(onPropertyChange);
-    const sideEffects = unitSideEffects();
+    const storage = unitPropertyStorage(() => propertyChangeHandler.call());
 
-    const scopeData: UnitScopeData = { storage, sideEffects };
+    const scopeData: UnitScope = { storage };
 
     const run = () =>
       runAction.exec(() =>
-        UnitScope.with(scopeData).run(() => {
+        UnitScopeManager.with(scopeData).run(() => {
+          propertyChangeHandler.reset();
           storage.reset();
-          const newBody = body(...args);
-          sideEffects.runQueue();
-          Object.assign(unitContainer, newBody);
+
+          Object.assign(unitContainer, body(...args));
         })
       );
 
