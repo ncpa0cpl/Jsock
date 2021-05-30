@@ -1,10 +1,12 @@
 import {
   simpleTestUnit,
   testUnitWithEffectOnValueChange,
+  testUnitWithNestedUnit,
   testUnitWithOuterMethodInBody,
   testUnitWithPropSetterWithinSideEffect,
   testUnitWithSideEffectOnCreate,
   testUnitWithSideEffectOnEveryChange,
+  testUnitWithUseUnit,
 } from "./testHelpers/testUnits";
 
 describe("Unit()", () => {
@@ -16,6 +18,30 @@ describe("Unit()", () => {
     u.setValue("another str");
 
     expect(u.value).toEqual("another str");
+  });
+  describe("correctly handles nested units", () => {
+    it("properly updates state with useUnit()", () => {
+      const unit = testUnitWithUseUnit("123");
+
+      expect(unit.val).toEqual("123");
+
+      unit.set("abc");
+
+      expect(unit.val).toEqual("abc");
+    });
+    it("properly not updates the state without useUnit()", () => {
+      const unit = testUnitWithNestedUnit("123");
+
+      expect(unit.val).toEqual("123");
+
+      unit.set("abc");
+
+      expect(unit.val).toEqual("123");
+
+      unit.update();
+
+      expect(unit.val).toEqual("abc");
+    });
   });
   describe("correctly handles updating a Unit from Within another Unit", () => {
     it("within sideEffect", () => {

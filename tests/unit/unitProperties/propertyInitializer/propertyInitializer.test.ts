@@ -7,8 +7,8 @@ describe("resolveInitializer()", () => {
     expect(resolveInitializer({ a: 1 }, undefined)).toMatchObject({ a: 1 });
   });
   it("correctly resolves methods", () => {
-    expect(resolveInitializer<number>((v) => v + 5, 1)).toEqual(6);
-    expect(resolveInitializer<string>((v) => `value: ${v}`, "123")).toEqual("value: 123");
-    expect(resolveInitializer<number[]>((v) => [0, ...v, 0], [1])).toEqual([0, 1, 0]);
+    expect(resolveInitializer((v: number) => v + 5, 1)).toEqual(6);
+    expect(resolveInitializer((v: string) => `value: ${v}`, "123")).toEqual("value: 123");
+    expect(resolveInitializer((v: number[]) => [0, ...v, 0], [1])).toEqual([0, 1, 0]);
   });
 });

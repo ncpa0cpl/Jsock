@@ -5,11 +5,11 @@ export function initUnitProperty<T = unknown>(handlePropertyChange: () => void):
   const property: UnitProperty<T> = {
     value: undefined as any,
     init(v) {
-      this.value = resolveInitializer(v, undefined);
+      this.value = resolveInitializer(v, undefined) as any;
       this.init = () => {};
     },
     set(v) {
-      this.value = resolveInitializer(v, this.value as any);
+      this.value = resolveInitializer(v, this.value as any) as any;
       handlePropertyChange();
     },
   };

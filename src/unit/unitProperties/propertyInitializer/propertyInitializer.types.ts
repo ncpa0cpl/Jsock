@@ -1,1 +1,3 @@
-export type Initializer<T> = T extends any ? T | ((old: T) => T) : never;
+export type Initializer<T> = ((old: T) => T) | T;
+
+export type InitializedType<T> = T extends (v: infer P) => infer P ? P : T;

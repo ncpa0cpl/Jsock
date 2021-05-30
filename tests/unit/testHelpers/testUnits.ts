@@ -1,10 +1,30 @@
-import { Unit, useProperty, useSideEffect } from "../../../src";
+import { Unit, useProperty, useReference, useSideEffect, useUnit } from "../../../src";
 
 export const simpleTestUnit = Unit((initVal: string) => {
   const [value, setValue] = useProperty(initVal);
   return {
     value,
     setValue,
+  };
+});
+
+export const testUnitWithNestedUnit = Unit((initVal: string) => {
+  const [_, triggerUpdate] = useProperty(null);
+  const simpleUnit = useReference(() => simpleTestUnit(initVal));
+
+  return {
+    val: simpleUnit.current.value,
+    set: simpleUnit.current.setValue,
+    update: () => triggerUpdate(null),
+  };
+});
+
+export const testUnitWithUseUnit = Unit((initVal: string) => {
+  const simpleUnit = useUnit(() => simpleTestUnit(initVal));
+
+  return {
+    val: simpleUnit.value,
+    set: simpleUnit.setValue,
   };
 });
 
