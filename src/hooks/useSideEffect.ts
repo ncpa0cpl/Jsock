@@ -1,11 +1,14 @@
-import { useReference } from ".";
+import { isPropertyInterface, useReference } from ".";
 import { compareArrays } from "../libs";
 import { UnitScopeManager } from "../unit";
 
 export function useSideEffect(effect: () => void, deps?: any[]) {
   const prevDeps = useReference<any[] | undefined>(undefined);
-  if (!deps || !prevDeps.current || !compareArrays(deps, prevDeps.current)) {
+
+  const currentDeps = deps?.map((d) => (isPropertyInterface(d) ? d.get() : d));
+
+  if (!currentDeps || !prevDeps.current || !compareArrays(currentDeps, prevDeps.current)) {
     UnitScopeManager.deferAction(effect);
-    if (deps) prevDeps.current = deps;
+    if (currentDeps) prevDeps.current = currentDeps;
   }
 }
